@@ -21,7 +21,7 @@ model PaymentMethod {
     id                   String                              @id @default(uuid())
     name                 String
     professionalPayments ProfessionalPayment_PaymentMethod[]
-    Visits_Payments      Visits_Payments[]
+    visitsPayments       Visits_Payments[]
 }
 
 // The payments to the professionals
@@ -30,14 +30,14 @@ model ProfessionalPayment {
     date           DateTime
     professional   Professional                        @relation(fields: [professionalId], references: [id])
     professionalId String
-    paymentMethods ProfessionalPayment_PaymentMethod[]
+    payments       ProfessionalPayment_PaymentMethod[]
 }
 
 // A payment to a professional may be composed of multiple payment methods. For example, they may try to pay part in cash, part with Mercado Pago, etc...
 // This table was made to support that many to many relationship.
 model ProfessionalPayment_PaymentMethod {
     id                     String              @id @default(uuid())
-    paymentProfessional    ProfessionalPayment @relation(fields: [professionalPaymentsId], references: [id])
+    professionalPayment    ProfessionalPayment @relation(fields: [professionalPaymentsId], references: [id])
     professionalPaymentsId String
     paymentMethod          PaymentMethod       @relation(fields: [paymentMethodId], references: [id])
     paymentMethodId        String
@@ -71,12 +71,12 @@ model Category {
 
 // Every time a customer visits the beauty center, a new visit is registered
 model Visits {
-    id              String            @id @default(uuid())
-    customer        Customer          @relation(fields: [customerId], references: [id])
-    customerId      String
-    date            DateTime
-    visits_services Visits_Services[]
-    visits_payments Visits_Payments[]
+    id         String            @id @default(uuid())
+    customer   Customer          @relation(fields: [customerId], references: [id])
+    customerId String
+    date       DateTime
+    services   Visits_Services[]
+    payments   Visits_Payments[]
 }
 
 // The services a Customer consumes when they visit the store (for example, they get their hair cut and their nails done)
