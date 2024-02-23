@@ -4,9 +4,6 @@ services:
   db:
     image: postgres
     restart: always
-    environment:
-      POSTGRES_DB: puraesencia_db
-      POSTGRES_PASSWORD: puraesenciadev
-      POSTGRES_USER: puraesencia
+    env_file: ".env"
     ports:
       - 6500:5432

@@ -9,14 +9,12 @@ export class PaymentMethodModel {
 	}
 
 	static async getByID(id: UUID): Promise<PaymentMethod> {
-		const paymentMethod = await prisma.paymentMethod.findUnique({
+		const paymentMethod = await prisma.paymentMethod.findUniqueOrThrow({
 			where: {
 				id: id,
 			},
 		});
-		if (paymentMethod === null) {
-			throw new Error(`PaymentMethod with id: ${id} not found`);
-		}
+
 		return paymentMethod;
 	}
 	static async create(paymentMethod: PaymentMethod): Promise<PaymentMethod> {

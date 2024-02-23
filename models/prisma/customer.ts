@@ -9,14 +9,12 @@ export class CustomerModel {
 	}
 
 	static async getByID(id: UUID): Promise<Customer> {
-		const customer = await prisma.customer.findUnique({
+		const customer = await prisma.customer.findUniqueOrThrow({
 			where: {
 				id: id,
 			},
 		});
-		if (customer === null) {
-			throw new Error(`Customer with id: ${id} not found`);
-		}
+
 		return customer;
 	}
 
