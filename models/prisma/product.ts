@@ -2,7 +2,7 @@ import prisma from "./client";
 import { UUID } from "crypto";
 import { Product } from "@prisma/client";
 
-export class ServiceModel {
+export class ProductModel {
 	static async getAll(): Promise<Array<Product>> {
 		return await prisma.product.findMany();
 	}
