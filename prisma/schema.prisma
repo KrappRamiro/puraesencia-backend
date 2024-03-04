@@ -10,90 +10,126 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// The professional that works in the beauty center
-model Professional {
-    id       String                @id @default(uuid())
-    payments ProfessionalPayment[]
-}
-
 // The payment methods that the beauty center support
 model PaymentMethod {
-    id                   String                               @id @default(uuid())
-    name                 String
-    professionalPayments ProfessionalPayment_PaymentMethods[]
-    visitsPayments       Visit_Payments[]
+    id   String @id @default(uuid())
+    name String
+
+    // Relationshipps
+    professionalPayments Professional_Payment_Method[]
+    VisitProductPayments Visit_Product_Payment[]
+}
+
+// The professional that works in the beauty center
+model Professional {
+    id   String @id @default(uuid())
+    cuit String
+
+    // Relationshipps
+    payments Professional_Payment[]
 }
 
 // The payments to the professionals
-model ProfessionalPayment {
-    id             String                               @id @default(uuid())
-    date           DateTime
-    professional   Professional                         @relation(fields: [professionalId], references: [id])
+model Professional_Payment {
+    id   String   @id @default(uuid())
+    date DateTime
+
+    // FK
     professionalId String
-    payments       ProfessionalPayment_PaymentMethods[]
+
+    // Relationships
+    professional Professional                  @relation(fields: [professionalId], references: [id])
+    methods      Professional_Payment_Method[]
 }
 
 // A payment to a professional may be composed of multiple payment methods. For example, they may try to pay part in cash, part with Mercado Pago, etc...
 // This table was made to support that many to many relationship.
-model ProfessionalPayment_PaymentMethods {
-    id                     String              @id @default(uuid())
-    professionalPayment    ProfessionalPayment @relation(fields: [professionalPaymentsId], references: [id])
-    professionalPaymentsId String
-    paymentMethod          PaymentMethod       @relation(fields: [paymentMethodId], references: [id])
-    paymentMethodId        String
-    amount                 Decimal             @db.Money
+model Professional_Payment_Method {
+    id     String  @id @default(uuid())
+    amount Decimal @db.Money
+
+    // FK
+    paymentId       String
+    paymentMethodId String
+
+    // Relationships
+    payment       Professional_Payment @relation(fields: [paymentId], references: [id])
+    paymentMethod PaymentMethod        @relation(fields: [paymentMethodId], references: [id])
 }
 
 // The customer table
 model Customer {
     id          String  @id @default(uuid())
     name        String
-    phoneNumber String
+    phoneNumber String?
     cuit        String?
-    visits      Visit[]
+
+    // Relationships
+    visits Visit[]
 }
 
-// A customer can visit the beauty store. They can consume different Services (like a haircut, get their nails done, etc...).
-model Service {
-    id             String           @id @default(uuid())
-    name           String
-    category       Category         @relation(fields: [categoryId], references: [id])
-    categoryId     String
-    visitsServices Visit_Services[]
+// A customer can visit the beauty store. They can consume different Products (like a haircut, get their nails done, etc...).
+model Product {
+    id   String @id @default(uuid())
+    name String
+
+    // FK
+    categoryId String
+
+    // Relationships
+    category Category        @relation(fields: [categoryId], references: [id])
+    visits   Visit_Product[]
 }
 
-// Those Services can have different categories (a haircuit is from the hairdressing category, getting the nails done is from the manicure category, etc...)
+// Those Products can have different categories (a haircuit is from the hairdressing category, getting the nails done is from the manicure category, etc...)
 model Category {
-    id       String    @id @default(uuid())
-    name     String
-    services Service[]
+    id   String @id @default(uuid())
+    name String
+
+    // Relationships
+    products Product[]
 }
 
 // Every time a customer visits the beauty center, a new visit is registered
 model Visit {
-    id         String           @id @default(uuid())
-    customer   Customer         @relation(fields: [customerId], references: [id])
+    id   String   @id @default(uuid())
+    date DateTime
+
+    // FK
     customerId String
-    date       DateTime
-    services   Visit_Services[]
-    payments   Visit_Payments[]
+
+    // Relationships
+    customer Customer                @relation(fields: [customerId], references: [id])
+    products Visit_Product[]
+    payments Visit_Product_Payment[]
 }
 
-// The services a Customer consumes when they visit the store (for example, they get their hair cut and their nails done)
-model Visit_Services {
-    id        String  @id @default(uuid())
-    visit     Visit   @relation(fields: [visitId], references: [id])
+// The products a Customer consumes when they visit the store (for example, they get their hair cut and their nails done)
+model Visit_Product {
+    id String @id @default(uuid())
+
+    // FK
     visitId   String
-    service   Service @relation(fields: [serviceId], references: [id])
-    serviceId String
+    productId String
+
+    // Relationships
+    visit    Visit                   @relation(fields: [visitId], references: [id])
+    product  Product                 @relation(fields: [productId], references: [id])
+    payments Visit_Product_Payment[]
 }
 
-// Each visit to the beauty center can be paid via multiple payment methods
-model Visit_Payments {
-    id              String        @id @default(uuid())
-    visit           Visit         @relation(fields: [visitId], references: [id])
+// Each product can be paid via multiple payment methods
+model Visit_Product_Payment {
+    id     String  @id @default(uuid())
+    amount Decimal @db.Money
+
+    // FK
     visitId         String
-    paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
     paymentMethodId String
-    amount          Decimal       @db.Money
+    visitProductId  String
+
+    // Relationships
+    visit         Visit         @relation(fields: [visitId], references: [id])
+    paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+    visitProduct  Visit_Product @relation(fields: [visitProductId], references: [id])
 }
