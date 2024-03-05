@@ -1,9 +1,9 @@
 //professional_Payment.ts
-import { Prisma, Professional_Payment, Professional_Payment_Method } from "@prisma/client";
+import { Prisma, Professional_Payment, Professional_Payment_Subpayment } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
 
-type Professional_Payment_MethodInput = Omit<Professional_Payment_Method, "id">;
+type Professional_Payment_SubpaymentInput = Omit<Professional_Payment_Subpayment, "id">;
 
 export class ProfessionalPaymentModel {
 	static async getAll(): Promise<Array<Professional_Payment>> {
@@ -20,7 +20,7 @@ export class ProfessionalPaymentModel {
 	static async create(input: {
 		date: Date;
 		professionalId: UUID;
-		payments: Array<Professional_Payment_MethodInput>;
+		subpayments: Array<Professional_Payment_SubpaymentInput>;
 	}): Promise<Professional_Payment> {
 		try {
 			// The transaction API allows you to execute multiple operations as a single atomic operation
@@ -41,12 +41,12 @@ export class ProfessionalPaymentModel {
 					},
 				});
 
-				// Step 2: Create records for Professional_Payment_Method and associate them with the new Professional_Payment
-				const createdPaymentMethods = await Promise.all(
-					input.payments.map(async (payment) => {
-						return prisma.professional_Payment_Method.create({
+				// Step 2: Create records for Professional_Payment_Subpayment and associate them with the new Professional_Payment
+				const createdSubpayments = await Promise.all(
+					input.subpayments.map(async (payment) => {
+						return prisma.professional_Payment_Subpayment.create({
 							data: {
-								payment: {
+								parentPayment: {
 									connect: { id: newProfessionalPayment.id },
 								},
 								paymentMethod: {
@@ -58,7 +58,7 @@ export class ProfessionalPaymentModel {
 					})
 				);
 				console.log("New professional payment created:", newProfessionalPayment);
-				console.log("Associated payment methods:", createdPaymentMethods);
+				console.log("Associated subpayments:", createdSubpayments);
 				return newProfessionalPayment; // return the created Professional_Payment
 			});
 		} catch (e) {
@@ -69,7 +69,7 @@ export class ProfessionalPaymentModel {
 
 	static async update(
 		id: UUID,
-		input: { date?: Date; professionalId: UUID; payments: Array<Professional_Payment_MethodInput> }
+		input: { date?: Date; professionalId: UUID; payments: Array<Professional_Payment_SubpaymentInput> }
 	): Promise<Professional_Payment> {
 		try {
 			return await prisma.$transaction(async (prisma) => {
@@ -85,14 +85,14 @@ export class ProfessionalPaymentModel {
 						},
 					},
 					include: {
-						methods: true,
+						subpayments: true,
 					},
 				});
 
 				const paymentMethodsUpdate = input.payments?.map((payment) => {
-					prisma.professional_Payment_Method.update({
+					prisma.professional_Payment_Subpayment.update({
 						where: {
-							id: payment.paymentId,
+							id: payment.parentPaymentId,
 						},
 						data: {
 							amount: payment.amount,

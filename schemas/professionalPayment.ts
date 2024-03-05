@@ -1,10 +1,8 @@
 import zod from "zod";
 
 const professionalPaymentSchema = zod.object({
-	name: zod.string(),
-	amount: zod.number(),
-	visitId: zod.string().uuid(),
-	paymentMethodId: zod.string().uuid(),
+	professionalId: zod.string().uuid(),
+	date: zod.date(),
 });
 
 type ProfessionalPayment = zod.infer<typeof professionalPaymentSchema>;

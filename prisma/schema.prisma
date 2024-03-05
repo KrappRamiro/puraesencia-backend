@@ -16,8 +16,8 @@ model PaymentMethod {
     name String
 
     // Relationshipps
-    professionalPayments Professional_Payment_Method[]
-    VisitProductPayments Visit_Product_Payment[]
+    professionalSubpayments Professional_Payment_Subpayment[]
+    VisitProductPayments    Visit_Product_Payment[]
 }
 
 // The professional that works in the beauty center
@@ -38,23 +38,26 @@ model Professional_Payment {
     professionalId String
 
     // Relationships
-    professional Professional                  @relation(fields: [professionalId], references: [id])
-    methods      Professional_Payment_Method[]
+    professional Professional                      @relation(fields: [professionalId], references: [id])
+    subpayments  Professional_Payment_Subpayment[]
 }
 
-// A payment to a professional may be composed of multiple payment methods. For example, they may try to pay part in cash, part with Mercado Pago, etc...
+// A payment to a professional may be composed of multiple  subpayments.
+// For example, a single payment may have a subpayment  in cash, a subpayment with Mercado Pago, etc...
 // This table was made to support that many to many relationship.
-model Professional_Payment_Method {
+model Professional_Payment_Subpayment {
     id     String  @id @unique @default(uuid())
     amount Decimal @db.Money
 
     // FK
-    paymentId       String
+    parentPaymentId String
     paymentMethodId String
 
     // Relationships
-    payment       Professional_Payment @relation(fields: [paymentId], references: [id])
+    parentPayment Professional_Payment @relation(fields: [parentPaymentId], references: [id])
     paymentMethod PaymentMethod        @relation(fields: [paymentMethodId], references: [id])
+
+    @@map("Professional_Payment_Method")
 }
 
 // The customer table
