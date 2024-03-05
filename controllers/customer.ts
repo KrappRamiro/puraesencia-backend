@@ -25,7 +25,8 @@ export class CustomerController {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
 		}
 
-		// TODO: Imlement
-		//const newCustomer = await CustomerModel.create(validation.data);
+		const newCustomer = await CustomerModel.create(validation.data);
+
+		res.status(200).json(newCustomer); // actualizar la cache del cliente
 	};
 }

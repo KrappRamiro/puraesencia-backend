@@ -2,8 +2,8 @@ import zod from "zod";
 
 const customerSchema = zod.object({
 	name: zod.string(),
-	phoneNumber: zod.string().optional(),
-	cuit: zod.string().optional(),
+	phoneNumber: zod.string().nullable(),
+	cuit: zod.string().nullable(),
 });
 
 type Customer = zod.infer<typeof customerSchema>;
