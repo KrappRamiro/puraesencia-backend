@@ -1,15 +1,17 @@
 //customer.ts
-import { Customer } from "@prisma/client";
+import { Customer, Prisma } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
+
+type CustomerInput = Omit<Customer, "id">;
 
 export class CustomerModel {
 	static async getAll(): Promise<Array<Customer>> {
 		return await prisma.customer.findMany();
 	}
 
-	static async getByID(id: UUID): Promise<Customer> {
-		const customer = await prisma.customer.findUniqueOrThrow({
+	static async getByID(id: UUID): Promise<Customer | null> {
+		const customer = await prisma.customer.findUnique({
 			where: {
 				id: id,
 			},
@@ -18,7 +20,7 @@ export class CustomerModel {
 		return customer;
 	}
 
-	static async create(customer: Customer): Promise<Customer> {
+	static async create(customer: CustomerInput): Promise<Customer> {
 		const createdCustomer = await prisma.customer.create({ data: customer });
 		return createdCustomer;
 	}

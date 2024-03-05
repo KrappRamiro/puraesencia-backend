@@ -2,13 +2,16 @@ import prisma from "./client";
 import { UUID } from "crypto";
 import { Customer, Product, Visit, Visit_Product_Payment, Visit_Product } from "@prisma/client";
 
+type VisitInput = Omit<Visit, "id">;
+type Visit_Product_PaymentInput = Omit<Visit_Product_Payment, "id">;
+
 export class VisitModel {
 	static async getAll(): Promise<Array<Visit>> {
 		return await prisma.visit.findMany();
 	}
 
-	static async getById(id: UUID): Promise<Visit> {
-		return await prisma.visit.findUniqueOrThrow({
+	static async getById(id: UUID): Promise<Visit | null> {
+		return await prisma.visit.findUnique({
 			where: {
 				id: id,
 			},
@@ -17,9 +20,8 @@ export class VisitModel {
 
 	static async create(input: {
 		visitProducts: Visit_Product[];
-		productPayments: Visit_Product_Payment[];
-		customerId: UUID;
-		date: Date;
+		productPayments: Visit_Product_PaymentInput[];
+		visit: VisitInput;
 	}): Promise<Visit> {
 		try {
 			// The transaction API allows you to execute multiple operations as a single atomic operation
@@ -31,8 +33,8 @@ export class VisitModel {
 				// Step 1: Create a new visit record
 				const newVisit = await prisma.visit.create({
 					data: {
-						date: input.date,
-						customer: { connect: { id: input.customerId } },
+						date: input.visit.date,
+						customer: { connect: { id: input.visit.customerId } },
 					},
 				});
 

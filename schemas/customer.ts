@@ -2,7 +2,7 @@ import zod from "zod";
 
 const customerSchema = zod.object({
 	name: zod.string(),
-	telefono: zod.string().optional(),
+	phoneNumber: zod.string().optional(),
 	cuit: zod.string().optional(),
 });
 

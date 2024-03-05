@@ -1,15 +1,17 @@
 //professional_Payment.ts
-import { Professional_Payment, Professional_Payment_Method } from "@prisma/client";
+import { Prisma, Professional_Payment, Professional_Payment_Method } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
+
+type Professional_Payment_MethodInput = Omit<Professional_Payment_Method, "id">;
 
 export class ProfessionalPaymentModel {
 	static async getAll(): Promise<Array<Professional_Payment>> {
 		return await prisma.professional_Payment.findMany();
 	}
 
-	static async getByID(id: UUID): Promise<Professional_Payment> {
-		return await prisma.professional_Payment.findUniqueOrThrow({
+	static async getByID(id: UUID): Promise<Professional_Payment | null> {
+		return await prisma.professional_Payment.findUnique({
 			where: {
 				id: id,
 			},
@@ -18,7 +20,7 @@ export class ProfessionalPaymentModel {
 	static async create(input: {
 		date: Date;
 		professionalId: UUID;
-		payments: Array<Professional_Payment_Method>;
+		payments: Array<Professional_Payment_MethodInput>;
 	}): Promise<Professional_Payment> {
 		try {
 			// The transaction API allows you to execute multiple operations as a single atomic operation
@@ -67,7 +69,7 @@ export class ProfessionalPaymentModel {
 
 	static async update(
 		id: UUID,
-		input: { date?: Date; professionalId: UUID; payments: Array<Professional_Payment_Method> }
+		input: { date?: Date; professionalId: UUID; payments: Array<Professional_Payment_MethodInput> }
 	): Promise<Professional_Payment> {
 		try {
 			return await prisma.$transaction(async (prisma) => {
@@ -90,7 +92,7 @@ export class ProfessionalPaymentModel {
 				const paymentMethodsUpdate = input.payments?.map((payment) => {
 					prisma.professional_Payment_Method.update({
 						where: {
-							id: payment.id,
+							id: payment.paymentId,
 						},
 						data: {
 							amount: payment.amount,

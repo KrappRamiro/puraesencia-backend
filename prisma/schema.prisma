@@ -12,7 +12,7 @@ datasource db {
 
 // The payment methods that the beauty center support
 model PaymentMethod {
-    id   String @id @default(uuid())
+    id   String @id @unique @default(uuid())
     name String
 
     // Relationshipps
@@ -22,7 +22,7 @@ model PaymentMethod {
 
 // The professional that works in the beauty center
 model Professional {
-    id   String @id @default(uuid())
+    id   String @id @unique @default(uuid())
     cuit String
 
     // Relationshipps
@@ -31,7 +31,7 @@ model Professional {
 
 // The payments to the professionals
 model Professional_Payment {
-    id   String   @id @default(uuid())
+    id   String   @id @unique @default(uuid())
     date DateTime
 
     // FK
@@ -45,7 +45,7 @@ model Professional_Payment {
 // A payment to a professional may be composed of multiple payment methods. For example, they may try to pay part in cash, part with Mercado Pago, etc...
 // This table was made to support that many to many relationship.
 model Professional_Payment_Method {
-    id     String  @id @default(uuid())
+    id     String  @id @unique @default(uuid())
     amount Decimal @db.Money
 
     // FK
@@ -59,7 +59,7 @@ model Professional_Payment_Method {
 
 // The customer table
 model Customer {
-    id          String  @id @default(uuid())
+    id          String  @id @unique @default(uuid())
     name        String
     phoneNumber String?
     cuit        String?
@@ -70,7 +70,7 @@ model Customer {
 
 // A customer can visit the beauty store. They can consume different Products (like a haircut, get their nails done, etc...).
 model Product {
-    id   String @id @default(uuid())
+    id   String @id @unique @default(uuid())
     name String
 
     // FK
@@ -83,7 +83,7 @@ model Product {
 
 // Those Products can have different categories (a haircuit is from the hairdressing category, getting the nails done is from the manicure category, etc...)
 model Category {
-    id   String @id @default(uuid())
+    id   String @id @unique @default(uuid())
     name String
 
     // Relationships
@@ -92,7 +92,7 @@ model Category {
 
 // Every time a customer visits the beauty center, a new visit is registered
 model Visit {
-    id   String   @id @default(uuid())
+    id   String   @id @unique @default(uuid())
     date DateTime
 
     // FK
@@ -106,7 +106,7 @@ model Visit {
 
 // The products a Customer consumes when they visit the store (for example, they get their hair cut and their nails done)
 model Visit_Product {
-    id String @id @default(uuid())
+    id String @id @unique @default(uuid())
 
     // FK
     visitId   String
@@ -120,7 +120,7 @@ model Visit_Product {
 
 // Each product can be paid via multiple payment methods
 model Visit_Product_Payment {
-    id     String  @id @default(uuid())
+    id     String  @id @unique @default(uuid())
     amount Decimal @db.Money
 
     // FK

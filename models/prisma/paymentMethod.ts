@@ -1,15 +1,16 @@
 //paymentMethod.ts
-import { PaymentMethod } from "@prisma/client";
+import { PaymentMethod, Prisma } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
 
+type PaymentMethodInput = Omit<PaymentMethod, "id">;
 export class PaymentMethodModel {
 	static async getAll(): Promise<Array<PaymentMethod>> {
 		return await prisma.paymentMethod.findMany();
 	}
 
-	static async getByID(id: UUID): Promise<PaymentMethod> {
-		const paymentMethod = await prisma.paymentMethod.findUniqueOrThrow({
+	static async getByID(id: UUID): Promise<PaymentMethod | null> {
+		const paymentMethod = await prisma.paymentMethod.findUnique({
 			where: {
 				id: id,
 			},
@@ -17,7 +18,7 @@ export class PaymentMethodModel {
 
 		return paymentMethod;
 	}
-	static async create(paymentMethod: PaymentMethod): Promise<PaymentMethod> {
+	static async create(paymentMethod: PaymentMethodInput): Promise<PaymentMethod> {
 		const createdPaymentMethod = await prisma.paymentMethod.create({ data: paymentMethod });
 		return createdPaymentMethod;
 	}
