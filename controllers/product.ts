@@ -1,39 +1,39 @@
-import { validateCustomer, validatePartialCustomer } from "../schemas/customer";
+import { validateProduct, validatePartialProduct } from "../schemas/product";
 import { Request, Response } from "express";
-import { CustomerModel } from "../models/prisma/customer";
+import { ProductModel } from "../models/prisma/product";
 import { UUID } from "crypto";
 import { Prisma } from "@prisma/client";
 
-export class CustomerController {
+export class ProductController {
 	getAll = async (req: Request, res: Response) => {
-		const customers = await CustomerModel.getAll();
-		return res.json(customers);
+		const products = await ProductModel.getAll();
+		return res.json(products);
 	};
 
 	getByID = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
-		const customer = await CustomerModel.getByID(id);
-		if (!customer) {
-			return res.status(403).json({ message: `Customer ${id} not found :(` });
+		const product = await ProductModel.getByID(id);
+		if (!product) {
+			return res.status(403).json({ message: `Product ${id} not found :(` });
 		}
-		return res.json(customer);
+		return res.json(product);
 	};
 
 	create = async (req: Request, res: Response) => {
-		const validation = validateCustomer(req.body);
+		const validation = validateProduct(req.body);
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
 		}
 
-		const newCustomer = await CustomerModel.create(validation.data);
+		const newProduct = await ProductModel.create(validation.data);
 
-		res.status(200).json(newCustomer); // actualizar la cache del cliente
+		res.status(200).json(newProduct); // actualizar la cache del cliente
 	};
 
 	delete = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
 		try {
-			const result = await CustomerModel.delete(id);
+			const result = await ProductModel.delete(id);
 			return res.json({ messsage: `Movie ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -46,7 +46,7 @@ export class CustomerController {
 	};
 
 	update = async (req: Request, res: Response) => {
-		const validation = validatePartialCustomer(req.body);
+		const validation = validatePartialProduct(req.body);
 
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
@@ -54,11 +54,11 @@ export class CustomerController {
 
 		const id = req.params.id as UUID;
 
-		const updatedCustomer = await CustomerModel.update({
+		const updatedProduct = await ProductModel.update({
 			id,
-			customer: validation.data,
+			product: validation.data,
 		});
 
-		return res.json(updatedCustomer);
+		return res.json(updatedProduct);
 	};
 }

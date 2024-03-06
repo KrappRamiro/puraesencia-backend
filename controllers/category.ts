@@ -1,39 +1,39 @@
-import { validateCustomer, validatePartialCustomer } from "../schemas/customer";
+import { validateCategory, validatePartialCategory } from "../schemas/category";
 import { Request, Response } from "express";
-import { CustomerModel } from "../models/prisma/customer";
+import { CategoryModel } from "../models/prisma/category";
 import { UUID } from "crypto";
 import { Prisma } from "@prisma/client";
 
-export class CustomerController {
+export class CategoryController {
 	getAll = async (req: Request, res: Response) => {
-		const customers = await CustomerModel.getAll();
-		return res.json(customers);
+		const categories = await CategoryModel.getAll();
+		return res.json(categories);
 	};
 
 	getByID = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
-		const customer = await CustomerModel.getByID(id);
-		if (!customer) {
-			return res.status(403).json({ message: `Customer ${id} not found :(` });
+		const category = await CategoryModel.getByID(id);
+		if (!category) {
+			return res.status(404).json({ message: `Category ${id} not found :(` });
 		}
-		return res.json(customer);
+		return res.json(category);
 	};
 
 	create = async (req: Request, res: Response) => {
-		const validation = validateCustomer(req.body);
+		const validation = validateCategory(req.body);
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
 		}
 
-		const newCustomer = await CustomerModel.create(validation.data);
+		const newCategory = await CategoryModel.create(validation.data);
 
-		res.status(200).json(newCustomer); // actualizar la cache del cliente
+		res.status(200).json(newCategory); // actualizar la cache del cliente
 	};
 
 	delete = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
 		try {
-			const result = await CustomerModel.delete(id);
+			const result = await CategoryModel.delete(id);
 			return res.json({ messsage: `Movie ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -46,7 +46,7 @@ export class CustomerController {
 	};
 
 	update = async (req: Request, res: Response) => {
-		const validation = validatePartialCustomer(req.body);
+		const validation = validatePartialCategory(req.body);
 
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
@@ -54,11 +54,11 @@ export class CustomerController {
 
 		const id = req.params.id as UUID;
 
-		const updatedCustomer = await CustomerModel.update({
+		const updatedCategory = await CategoryModel.update({
 			id,
-			customer: validation.data,
+			category: validation.data,
 		});
 
-		return res.json(updatedCustomer);
+		return res.json(updatedCategory);
 	};
 }

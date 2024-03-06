@@ -1,39 +1,39 @@
-import { validateCustomer, validatePartialCustomer } from "../schemas/customer";
+import { validateProfessional, validatePartialProfessional } from "../schemas/professional";
 import { Request, Response } from "express";
-import { CustomerModel } from "../models/prisma/customer";
+import { ProfessionalModel } from "../models/prisma/professional";
 import { UUID } from "crypto";
 import { Prisma } from "@prisma/client";
 
-export class CustomerController {
+export class ProfessionalController {
 	getAll = async (req: Request, res: Response) => {
-		const customers = await CustomerModel.getAll();
-		return res.json(customers);
+		const professionals = await ProfessionalModel.getAll();
+		return res.json(professionals);
 	};
 
 	getByID = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
-		const customer = await CustomerModel.getByID(id);
-		if (!customer) {
-			return res.status(403).json({ message: `Customer ${id} not found :(` });
+		const professional = await ProfessionalModel.getByID(id);
+		if (!professional) {
+			return res.status(403).json({ message: `Professional ${id} not found :(` });
 		}
-		return res.json(customer);
+		return res.json(professional);
 	};
 
 	create = async (req: Request, res: Response) => {
-		const validation = validateCustomer(req.body);
+		const validation = validateProfessional(req.body);
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
 		}
 
-		const newCustomer = await CustomerModel.create(validation.data);
+		const newProfessional = await ProfessionalModel.create(validation.data);
 
-		res.status(200).json(newCustomer); // actualizar la cache del cliente
+		res.status(200).json(newProfessional); // actualizar la cache del cliente
 	};
 
 	delete = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
 		try {
-			const result = await CustomerModel.delete(id);
+			const result = await ProfessionalModel.delete(id);
 			return res.json({ messsage: `Movie ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -46,7 +46,7 @@ export class CustomerController {
 	};
 
 	update = async (req: Request, res: Response) => {
-		const validation = validatePartialCustomer(req.body);
+		const validation = validatePartialProfessional(req.body);
 
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
@@ -54,11 +54,11 @@ export class CustomerController {
 
 		const id = req.params.id as UUID;
 
-		const updatedCustomer = await CustomerModel.update({
+		const updatedProfessional = await ProfessionalModel.update({
 			id,
-			customer: validation.data,
+			professional: validation.data,
 		});
 
-		return res.json(updatedCustomer);
+		return res.json(updatedProfessional);
 	};
 }

@@ -1,39 +1,39 @@
-import { validateCustomer, validatePartialCustomer } from "../schemas/customer";
+import { validatePaymentMethod, validatePartialPaymentMethod } from "../schemas/paymentMethod";
 import { Request, Response } from "express";
-import { CustomerModel } from "../models/prisma/customer";
+import { PaymentMethodModel } from "../models/prisma/paymentMethod";
 import { UUID } from "crypto";
 import { Prisma } from "@prisma/client";
 
-export class CustomerController {
+export class PaymentMethodController {
 	getAll = async (req: Request, res: Response) => {
-		const customers = await CustomerModel.getAll();
-		return res.json(customers);
+		const categories = await PaymentMethodModel.getAll();
+		return res.json(categories);
 	};
 
 	getByID = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
-		const customer = await CustomerModel.getByID(id);
-		if (!customer) {
-			return res.status(403).json({ message: `Customer ${id} not found :(` });
+		const paymentMethod = await PaymentMethodModel.getByID(id);
+		if (!paymentMethod) {
+			return res.status(403).json({ message: `PaymentMethod ${id} not found :(` });
 		}
-		return res.json(customer);
+		return res.json(paymentMethod);
 	};
 
 	create = async (req: Request, res: Response) => {
-		const validation = validateCustomer(req.body);
+		const validation = validatePaymentMethod(req.body);
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
 		}
 
-		const newCustomer = await CustomerModel.create(validation.data);
+		const newPaymentMethod = await PaymentMethodModel.create(validation.data);
 
-		res.status(200).json(newCustomer); // actualizar la cache del cliente
+		res.status(200).json(newPaymentMethod); // actualizar la cache del cliente
 	};
 
 	delete = async (req: Request, res: Response) => {
 		const id = req.params.id as UUID;
 		try {
-			const result = await CustomerModel.delete(id);
+			const result = await PaymentMethodModel.delete(id);
 			return res.json({ messsage: `Movie ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -46,7 +46,7 @@ export class CustomerController {
 	};
 
 	update = async (req: Request, res: Response) => {
-		const validation = validatePartialCustomer(req.body);
+		const validation = validatePartialPaymentMethod(req.body);
 
 		if (!validation.success) {
 			return res.status(400).json({ error: JSON.parse(validation.error.message) });
@@ -54,11 +54,11 @@ export class CustomerController {
 
 		const id = req.params.id as UUID;
 
-		const updatedCustomer = await CustomerModel.update({
+		const updatedPaymentMethod = await PaymentMethodModel.update({
 			id,
-			customer: validation.data,
+			paymentMethod: validation.data,
 		});
 
-		return res.json(updatedCustomer);
+		return res.json(updatedPaymentMethod);
 	};
 }
