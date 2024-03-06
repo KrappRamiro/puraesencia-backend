@@ -9,7 +9,7 @@ export const createCustomerRouter = () => {
 	customerRouter.get("/", customerController.getAll);
 	customerRouter.post("/", customerController.create);
 
-	customerRouter.get("/:id", customerController.getById);
+	customerRouter.get("/:id", customerController.getByID);
 	customerRouter.delete("/:id", customerController.delete);
 	customerRouter.patch("/:id", customerController.update);
 
