@@ -1,7 +1,9 @@
+import { Prisma } from "@prisma/client";
 import zod from "zod";
 
 const professionalSubpaymentSchema = zod.object({
-	amount: zod.number(),
+	amount: zod.instanceof(Prisma.Decimal),
+	parentPaymentId: zod.string().uuid(),
 	paymentMethodId: zod.string().uuid(),
 });
 

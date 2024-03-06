@@ -1,8 +1,10 @@
 import zod from "zod";
 
+import { Prisma } from "@prisma/client";
+
 const productSchema = zod.object({
 	name: zod.string(),
-	suggestedPrice: zod.number(),
+	suggestedPrice: zod.instanceof(Prisma.Decimal),
 	categoryId: zod.string().uuid(),
 });
 
