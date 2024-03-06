@@ -1,6 +1,6 @@
 import prisma from "./client";
 import { UUID } from "crypto";
-import { Customer, Product, Visit, Visit_Product_Payment, Visit_Product } from "@prisma/client";
+import { Customer, Visit, Visit_Product_Payment, Visit_Product } from "@prisma/client";
 
 type VisitInput = Omit<Visit, "id">;
 type Visit_Product_PaymentInput = Omit<Visit_Product_Payment, "id">;
@@ -10,7 +10,7 @@ export class VisitModel {
 		return await prisma.visit.findMany();
 	}
 
-	static async getById(id: UUID): Promise<Visit | null> {
+	static async getByID(id: UUID): Promise<Visit | null> {
 		return await prisma.visit.findUnique({
 			where: {
 				id: id,

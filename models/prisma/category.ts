@@ -1,7 +1,7 @@
 //category.ts
 import prisma from "./client";
 import { UUID } from "crypto";
-import { Category, Prisma } from "@prisma/client";
+import { Category } from "@prisma/client";
 
 type CategoryInput = Omit<Category, "id">;
 
@@ -10,7 +10,7 @@ export class CategoryModel {
 		return await prisma.category.findMany();
 	}
 
-	static async getById(id: UUID): Promise<Category | null> {
+	static async getByID(id: UUID): Promise<Category | null> {
 		return await prisma.category.findUnique({
 			where: {
 				id: id,

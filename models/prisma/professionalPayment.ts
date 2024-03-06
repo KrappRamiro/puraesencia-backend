@@ -1,5 +1,5 @@
 //professional_Payment.ts
-import { Prisma, Professional_Payment, Professional_Payment_Subpayment } from "@prisma/client";
+import { Professional_Payment, Professional_Payment_Subpayment } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
 

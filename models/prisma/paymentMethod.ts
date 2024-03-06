@@ -1,5 +1,5 @@
 //paymentMethod.ts
-import { PaymentMethod, Prisma } from "@prisma/client";
+import { PaymentMethod } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
 

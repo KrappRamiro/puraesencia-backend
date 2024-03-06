@@ -1,5 +1,5 @@
 //customer.ts
-import { Customer, Prisma } from "@prisma/client";
+import { Customer } from "@prisma/client";
 import prisma from "./client";
 import { UUID } from "crypto";
 

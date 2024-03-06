@@ -1,6 +1,6 @@
 import prisma from "./client";
 import { UUID } from "crypto";
-import { Prisma, Product } from "@prisma/client";
+import { Product } from "@prisma/client";
 
 type ProductInput = Omit<Product, "id">;
 export class ProductModel {
@@ -8,7 +8,7 @@ export class ProductModel {
 		return await prisma.product.findMany();
 	}
 
-	static async getById(id: UUID): Promise<Product | null> {
+	static async getByID(id: UUID): Promise<Product | null> {
 		return await prisma.product.findUnique({
 			where: {
 				id: id,
