@@ -10,17 +10,14 @@ export class PaymentMethodModel {
 	}
 
 	static async getByID(id: UUID): Promise<PaymentMethod | null> {
-		const paymentMethod = await prisma.paymentMethod.findUnique({
+		return await prisma.paymentMethod.findUnique({
 			where: {
 				id: id,
 			},
 		});
-
-		return paymentMethod;
 	}
 	static async create(paymentMethod: PaymentMethodInput): Promise<PaymentMethod> {
-		const createdPaymentMethod = await prisma.paymentMethod.create({ data: paymentMethod });
-		return createdPaymentMethod;
+		return await prisma.paymentMethod.create({ data: paymentMethod });
 	}
 
 	static async update({
@@ -28,23 +25,21 @@ export class PaymentMethodModel {
 		paymentMethod,
 	}: {
 		id: UUID;
-		paymentMethod: Partial<PaymentMethod>;
+		paymentMethod: Partial<PaymentMethodInput>;
 	}): Promise<PaymentMethod> {
-		const updatedPaymentMethod = await prisma.paymentMethod.update({
+		return await prisma.paymentMethod.update({
 			where: {
 				id: id,
 			},
 			data: paymentMethod,
 		});
-		return updatedPaymentMethod;
 	}
 
 	static async delete(id: UUID): Promise<{ id: string }> {
-		const deletedPaymentMethod = await prisma.paymentMethod.delete({
+		return await prisma.paymentMethod.delete({
 			where: {
 				id: id,
 			},
 		});
-		return deletedPaymentMethod;
 	}
 }

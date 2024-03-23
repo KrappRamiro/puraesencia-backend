@@ -1,11 +1,19 @@
-import zod from "zod";
+import z from "zod";
+import { Prisma } from "@prisma/client";
 
-const professionalPaymentSchema = zod.object({
-	professionalId: zod.string().uuid(),
-	date: zod.date(),
+const professionalPaymentSchema = z.object({
+	professionalId: z.string().uuid(),
+	date: z.date(),
+	subpayments: z.array(
+		z.object({
+			amount: z.instanceof(Prisma.Decimal),
+			parentPaymentId: z.string().uuid(),
+			paymentMethodId: z.string().uuid(),
+		})
+	),
 });
 
-type ProfessionalPayment = zod.infer<typeof professionalPaymentSchema>;
+type ProfessionalPayment = z.infer<typeof professionalPaymentSchema>;
 
 export function validateProfessionalPayment(input: ProfessionalPayment) {
 	return professionalPaymentSchema.safeParse(input);

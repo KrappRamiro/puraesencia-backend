@@ -1,11 +1,12 @@
-import zod from "zod";
+import z from "zod";
 
-const visitSchema = zod.object({
-	customerId: zod.string().uuid(),
-	date: zod.date(),
+const visitSchema = z.object({
+	customerId: z.string().uuid(),
+	date: z.date(),
+	
 });
 
-type visit = zod.infer<typeof visitSchema>;
+type visit = z.infer<typeof visitSchema>;
 
 export function validateVisit(input: visit) {
 	return visitSchema.safeParse(input);

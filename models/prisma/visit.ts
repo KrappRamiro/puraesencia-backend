@@ -1,9 +1,15 @@
 import prisma from "./client";
 import { UUID } from "crypto";
 import { Customer, Visit, Visit_Product_Payment, Visit_Product } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
 
-type VisitInput = Omit<Visit, "id">;
-type Visit_Product_PaymentInput = Omit<Visit_Product_Payment, "id">;
+type BaseVisitInput = Omit<Visit, "id">;
+
+type VisitProductInput = {
+	productId: UUID;
+	payments: Array<Omit<Visit_Product_Payment, "visitId" | "visitProductId" | "id">>;
+};
+type CreateVisitInput = BaseVisitInput & { products: VisitProductInput[] };
 
 export class VisitModel {
 	static async getAll(): Promise<Array<Visit>> {
@@ -18,42 +24,43 @@ export class VisitModel {
 		});
 	}
 
-	static async create(input: {
-		visitProducts: Visit_Product[];
-		productPayments: Visit_Product_PaymentInput[];
-		visit: VisitInput;
-	}): Promise<Visit> {
+	static async create(visit: CreateVisitInput): Promise<Visit> {
 		try {
-			// The transaction API allows you to execute multiple operations as a single atomic operation
-			// ensuring that either all operations succeed or none do, which is crucial for maintaining data integrity.
-			//
-			// if any operation within the transaction fails, Prisma will automatically roll back
-			// all changes made during the transaction, ensuring that the data remains consistent
 			return await prisma.$transaction(async (prisma) => {
 				// Step 1: Create a new visit record
 				const newVisit = await prisma.visit.create({
 					data: {
-						date: input.visit.date,
-						customer: { connect: { id: input.visit.customerId } },
+						date: visit.date,
+						customer: { connect: { id: visit.customerId } },
 					},
 				});
 
-				// Step 2: Create records for the the products, and associate them with the new visit
-				const productsData = input.visitProducts.map((product) => ({
-					visitId: newVisit.id,
-					productId: product.id,
-				}));
+				// For each visitProduct, create a Visit_Product with its payments
+				const createdProducts = await Promise.all(
+					visit.products.map(async (product) => {
+						// Create the Visit_Product record along with payments
+						const newVisitProduct = await prisma.visit_Product.create({
+							data: {
+								visit: { connect: { id: newVisit.id } },
+								product: { connect: { id: product.productId } },
+								payments: {
+									create: product.payments.map((payment) => ({
+										paymentMethod: { connect: { id: payment.paymentMethodId } },
+										amount: payment.amount,
+										visit: { connect: { id: newVisit.id } },
+									})),
+								},
+							},
+							include: {
+								payments: true,
+							},
+						});
 
-				// Step 3: Create records for the the payments, and associate them with the new visit
-				const paymentsData = input.productPayments.map((payment) => ({
-					visitId: newVisit.id,
-					amount: payment.amount,
-					paymentMethodId: payment.paymentMethodId,
-					visitProductId: payment.visitProductId,
-				}));
+						return newVisitProduct;
+					})
+				);
+				console.log(`For new visit ${newVisit.id} created products ${createdProducts}`);
 
-				await prisma.visit_Product.createMany({ data: productsData });
-				await prisma.visit_Product_Payment.createMany({ data: paymentsData });
 				return newVisit;
 			});
 		} catch (error) {
@@ -65,10 +72,10 @@ export class VisitModel {
 		id: UUID,
 		input: {
 			visitId: UUID;
-			date?: Date;
-			products?: Array<Visit_Product>;
-			productPayments?: Array<Visit_Product_Payment>;
-			customer?: Customer;
+			date: Date;
+			products: Array<Visit_Product>;
+			productPayments: Array<Visit_Product_Payment>;
+			customer: Customer;
 		}
 	): Promise<Visit> {
 		try {

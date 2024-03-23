@@ -1,14 +1,14 @@
-import zod from "zod";
+import z from "zod";
 
 import { Prisma } from "@prisma/client";
 
-const productSchema = zod.object({
-	name: zod.string(),
-	suggestedPrice: zod.instanceof(Prisma.Decimal),
-	categoryId: zod.string().uuid(),
+const productSchema = z.object({
+	name: z.string(),
+	suggestedPrice: z.instanceof(Prisma.Decimal),
+	categoryId: z.string().uuid(),
 });
 
-type Product = zod.infer<typeof productSchema>;
+type Product = z.infer<typeof productSchema>;
 
 export function validateProduct(input: Product) {
 	return productSchema.safeParse(input);

@@ -1,10 +1,10 @@
-import zod from "zod";
+import z from "zod";
 
-const paymentMethodSchema = zod.object({
-	name: zod.string(),
+const paymentMethodSchema = z.object({
+	name: z.string(),
 });
 
-type PaymentMethod = zod.infer<typeof paymentMethodSchema>;
+type PaymentMethod = z.infer<typeof paymentMethodSchema>;
 
 export function validatePaymentMethod(input: PaymentMethod) {
 	return paymentMethodSchema.safeParse(input);

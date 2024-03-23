@@ -3,7 +3,7 @@ import { Professional_Payment, Professional_Payment_Subpayment } from "@prisma/c
 import prisma from "./client";
 import { UUID } from "crypto";
 
-type Professional_Payment_SubpaymentInput = Omit<Professional_Payment_Subpayment, "id">;
+type Professional_Payment_SubpaymentInput = Omit<Professional_Payment_Subpayment, "id" | "parentPaymentId">;
 
 export class ProfessionalPaymentModel {
 	static async getAll(): Promise<Array<Professional_Payment>> {
@@ -29,7 +29,6 @@ export class ProfessionalPaymentModel {
 			// if any operation within the transaction fails, Prisma will automatically roll back
 			// all changes made during the transaction, ensuring that the data remains consistent
 			return await prisma.$transaction(async (prisma) => {
-				// Step 1: Create a new Professional_Payment record
 				const newProfessionalPayment = await prisma.professional_Payment.create({
 					data: {
 						date: input.date,
@@ -38,27 +37,18 @@ export class ProfessionalPaymentModel {
 								id: input.professionalId,
 							},
 						},
-					},
-				});
-
-				// Step 2: Create records for Professional_Payment_Subpayment and associate them with the new Professional_Payment
-				const createdSubpayments = await Promise.all(
-					input.subpayments.map(async (payment) => {
-						return prisma.professional_Payment_Subpayment.create({
-							data: {
-								parentPayment: {
-									connect: { id: newProfessionalPayment.id },
-								},
+						subpayments: {
+							create: input.subpayments.map((payment) => ({
 								paymentMethod: {
 									connect: { id: payment.paymentMethodId },
 								},
 								amount: payment.amount,
-							},
-						});
-					})
-				);
+							})),
+						},
+					},
+				});
+
 				console.log("New professional payment created:", newProfessionalPayment);
-				console.log("Associated subpayments:", createdSubpayments);
 				return newProfessionalPayment; // return the created Professional_Payment
 			});
 		} catch (e) {
@@ -67,46 +57,51 @@ export class ProfessionalPaymentModel {
 		}
 	}
 
+	static async addSubpayment(input: { id: UUID; subpayment: Professional_Payment_SubpaymentInput }) {
+		try {
+			const existingPayment = await prisma.professional_Payment.findUnique({
+				where: { id: input.id },
+				include: { subpayments: true },
+			});
+
+			if (!existingPayment) {
+				throw new Error("Professional Payment with ");
+			}
+		} catch (error) {}
+	}
+
 	static async update(
 		id: UUID,
-		input: { date?: Date; professionalId: UUID; payments: Array<Professional_Payment_SubpaymentInput> }
+		input: { date?: Date; professionalId?: UUID; subpayments?: Array<Professional_Payment_Subpayment> }
 	): Promise<Professional_Payment> {
 		try {
 			return await prisma.$transaction(async (prisma) => {
 				// Update professional payment
-				const professionalPaymentUpdate = prisma.professional_Payment.update({
+				const updatedPayment = prisma.professional_Payment.update({
 					where: { id: id },
 					data: {
 						date: input.date,
-						professional: {
-							connect: {
-								id: input.professionalId,
-							},
-						},
+						professional: input.professionalId
+							? {
+									connect: {
+										id: input.professionalId,
+									},
+							  }
+							: undefined, // If professionalId is not provided, set it to undefined
+						subpayments: input.subpayments
+							? {
+									updateMany: input.subpayments.map((subpayment) => ({
+										where: { id: subpayment.id },
+										data: subpayment,
+									})),
+							  }
+							: undefined, // If subpayments is not provided, set it to undefined
 					},
 					include: {
 						subpayments: true,
 					},
 				});
-
-				const paymentMethodsUpdate = input.payments?.map((payment) => {
-					prisma.professional_Payment_Subpayment.update({
-						where: {
-							id: payment.parentPaymentId,
-						},
-						data: {
-							amount: payment.amount,
-							paymentMethod: { connect: { id: id } },
-						},
-					});
-				});
-
-				const [updatedProfessionalPayment, ...rest] = await Promise.all([
-					professionalPaymentUpdate,
-					...paymentMethodsUpdate,
-				]);
-
-				return updatedProfessionalPayment;
+				return updatedPayment;
 			});
 		} catch (e) {
 			console.error(e);

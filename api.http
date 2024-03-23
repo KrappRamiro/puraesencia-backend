@@ -1,0 +1,14 @@
+### Recuperar todos los profesionales
+GET http://localhost:3000/professionals/
+
+### Add professional
+POST http://localhost:3000/professionals/
+Content-Type: application/json
+
+{
+  "name": "Constanza Ayelen Rodriguez",
+  "cuit": "27467679265"
+}
+
+### Delete professional
+DELETE  http://localhost:3000/professionals/d4011c6c-8a9e-495a-a8ac-025388d8e900

@@ -1,12 +1,12 @@
-import zod from "zod";
+import z from "zod";
 
-const customerSchema = zod.object({
-	name: zod.string(),
-	phoneNumber: zod.string().nullable(),
-	cuit: zod.string().nullable(),
+const customerSchema = z.object({
+	name: z.string(),
+	phoneNumber: z.string().nullable(),
+	cuit: z.string().nullable(),
 });
 
-type Customer = zod.infer<typeof customerSchema>;
+type Customer = z.infer<typeof customerSchema>;
 
 export function validateCustomer(input: Customer) {
 	return customerSchema.safeParse(input);

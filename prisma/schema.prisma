@@ -13,7 +13,7 @@ datasource db {
 // The payment methods that the beauty center support
 model PaymentMethod {
     id   String @id @unique @default(uuid())
-    name String
+    name String @unique
 
     // Relationshipps
     professionalSubpayments Professional_Payment_Subpayment[]
@@ -23,7 +23,8 @@ model PaymentMethod {
 // The professional that works in the beauty center
 model Professional {
     id   String @id @unique @default(uuid())
-    cuit String
+    name String @unique
+    cuit String @unique
 
     // Relationshipps
     payments Professional_Payment[]
@@ -64,8 +65,8 @@ model Professional_Payment_Subpayment {
 model Customer {
     id          String  @id @unique @default(uuid())
     name        String
-    phoneNumber String?
-    cuit        String?
+    phoneNumber String? @unique
+    cuit        String? @unique
 
     // Relationships
     visits Visit[]
@@ -87,7 +88,7 @@ model Product {
 // Those Products can have different categories (a haircuit is from the hairdressing category, getting the nails done is from the manicure category, etc...)
 model Category {
     id   String @id @unique @default(uuid())
-    name String
+    name String @unique
 
     // Relationships
     products Product[]

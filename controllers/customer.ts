@@ -34,11 +34,11 @@ export class CustomerController {
 		const id = req.params.id as UUID;
 		try {
 			const result = await CustomerModel.delete(id);
-			return res.json({ messsage: `Movie ${result} deleted` });
+			return res.json({ messsage: `Customer ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === "P2016") {
-					return res.status(404).json({ message: "Movie not found" });
+					return res.status(404).json({ message: "Customer not found" });
 				}
 			}
 			return res.status(400).json(error);

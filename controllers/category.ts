@@ -34,11 +34,11 @@ export class CategoryController {
 		const id = req.params.id as UUID;
 		try {
 			const result = await CategoryModel.delete(id);
-			return res.json({ messsage: `Movie ${result} deleted` });
+			return res.json({ messsage: `Category ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === "P2016") {
-					return res.status(404).json({ message: "Movie not found" });
+					return res.status(404).json({ message: "Category not found" });
 				}
 			}
 			return res.status(400).json(error);

@@ -1,11 +1,11 @@
-import zod from "zod";
+import z from "zod";
 
-const professionalSchema = zod.object({
-	name: zod.string(),
-	cuit: zod.string(),
+const professionalSchema = z.object({
+	name: z.string(),
+	cuit: z.string(),
 });
 
-type Professional = zod.infer<typeof professionalSchema>;
+type Professional = z.infer<typeof professionalSchema>;
 
 export function validateProfessional(input: Professional) {
 	return professionalSchema.safeParse(input);

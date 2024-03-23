@@ -1,10 +1,10 @@
-import zod from "zod";
+import z from "zod";
 
-const categorySchema = zod.object({
-	name: zod.string(),
+const categorySchema = z.object({
+	name: z.string(),
 });
 
-type Category = zod.infer<typeof categorySchema>;
+type Category = z.infer<typeof categorySchema>;
 
 export function validateCategory(input: Category) {
 	return categorySchema.safeParse(input);

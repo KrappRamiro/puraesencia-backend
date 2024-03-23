@@ -6,17 +6,25 @@ import { Prisma } from "@prisma/client";
 
 export class PaymentMethodController {
 	getAll = async (req: Request, res: Response) => {
-		const categories = await PaymentMethodModel.getAll();
-		return res.json(categories);
+		try {
+			const categories = await PaymentMethodModel.getAll();
+			return res.json(categories);
+		} catch (error) {
+			res.status(500).json(error);
+		}
 	};
 
 	getByID = async (req: Request, res: Response) => {
-		const id = req.params.id as UUID;
-		const paymentMethod = await PaymentMethodModel.getByID(id);
-		if (!paymentMethod) {
-			return res.status(403).json({ message: `PaymentMethod ${id} not found :(` });
+		try {
+			const id = req.params.id as UUID;
+			const paymentMethod = await PaymentMethodModel.getByID(id);
+			if (!paymentMethod) {
+				return res.status(404).json({ message: `PaymentMethod ${id} not found :(` });
+			}
+			return res.json(paymentMethod);
+		} catch (error) {
+			res.status(500).json(error);
 		}
-		return res.json(paymentMethod);
 	};
 
 	create = async (req: Request, res: Response) => {
@@ -34,11 +42,11 @@ export class PaymentMethodController {
 		const id = req.params.id as UUID;
 		try {
 			const result = await PaymentMethodModel.delete(id);
-			return res.json({ messsage: `Movie ${result} deleted` });
+			return res.json({ messsage: `Payment Method ${result} deleted` });
 		} catch (error) {
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === "P2016") {
-					return res.status(404).json({ message: "Movie not found" });
+					return res.status(404).json({ message: "Payment Method not found" });
 				}
 			}
 			return res.status(400).json(error);

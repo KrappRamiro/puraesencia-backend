@@ -1,15 +1,15 @@
-import zod from "zod";
+import z from "zod";
 import { Prisma } from "@prisma/client";
 
-const productPaymentSchema = zod.object({
-	name: zod.string(),
-	amount: zod.instanceof(Prisma.Decimal),
-	visitId: zod.string().uuid(),
-	productId: zod.string().uuid(),
-	paymentMethodId: zod.string().uuid(),
+const productPaymentSchema = z.object({
+	name: z.string(),
+	amount: z.instanceof(Prisma.Decimal),
+	visitId: z.string().uuid(),
+	productId: z.string().uuid(),
+	paymentMethodId: z.string().uuid(),
 });
 
-type productPayment = zod.infer<typeof productPaymentSchema>;
+type productPayment = z.infer<typeof productPaymentSchema>;
 
 export function validateProductPayment(input: productPayment) {
 	return productPaymentSchema.safeParse(input);
