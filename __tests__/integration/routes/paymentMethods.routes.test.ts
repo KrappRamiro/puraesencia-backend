@@ -78,7 +78,7 @@ describe("Payment method routes", () => {
 	});
 
 	describe("UPDATE routes", () => {
-		it("Should be able to update a payment method", async () => {
+		it("Should be able to update the name", async () => {
 			const paymentMethodUpdate: Partial<PaymentMethodSchema> = {
 				name: "TARJETA TODOPODEROSA!",
 			};
@@ -86,6 +86,33 @@ describe("Payment method routes", () => {
 				.patch(`${BASE_URL}/${initializedElements[2].id}`)
 				.set("Accept", "application/json")
 				.send(paymentMethodUpdate)
+				.expect("Content-Type", /json/)
+				.expect(200);
+			validatePaymentMethod(updateRes.body);
+		});
+		it("An empty object as payload should not give an error", async () => {
+			const updateRes = await request(app)
+				.patch(`${BASE_URL}/${initializedElements[2].id}`)
+				.set("Accept", "application/json")
+				.send({})
+				.expect("Content-Type", /json/)
+				.expect(200);
+			validatePaymentMethod(updateRes.body);
+		});
+		it("An empty body should not give an error", async () => {
+			const updateRes = await request(app)
+				.patch(`${BASE_URL}/${initializedElements[2].id}`)
+				.set("Accept", "application/json")
+				.send()
+				.expect("Content-Type", /json/)
+				.expect(200);
+			validatePaymentMethod(updateRes.body);
+		});
+		it("An empty string should not give an error", async () => {
+			const updateRes = await request(app)
+				.patch(`${BASE_URL}/${initializedElements[2].id}`)
+				.set("Accept", "application/json")
+				.send("")
 				.expect("Content-Type", /json/)
 				.expect(200);
 			validatePaymentMethod(updateRes.body);
