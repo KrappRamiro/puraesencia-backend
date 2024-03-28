@@ -13,11 +13,13 @@ const professionalPaymentSchema = z.object({
 	),
 });
 
-type ProfessionalPayment = z.infer<typeof professionalPaymentSchema>;
+type ProfessionalPaymentSchema = z.infer<typeof professionalPaymentSchema>;
 
-export function validateProfessionalPayment(input: ProfessionalPayment) {
+export function validateProfessionalPayment(input: ProfessionalPaymentSchema) {
 	return professionalPaymentSchema.safeParse(input);
 }
-export function validatePartialProfessionalPayment(input: Partial<ProfessionalPayment>) {
+export function validatePartialProfessionalPayment(input: Partial<ProfessionalPaymentSchema>) {
 	return professionalPaymentSchema.partial().safeParse(input);
 }
+
+export type { ProfessionalPaymentSchema };

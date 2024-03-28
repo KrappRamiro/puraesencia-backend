@@ -4,11 +4,12 @@ const categorySchema = z.object({
 	name: z.string(),
 });
 
-type Category = z.infer<typeof categorySchema>;
+type CategorySchema = z.infer<typeof categorySchema>;
 
-export function validateCategory(input: Category) {
+export function validateCategory(input: CategorySchema) {
 	return categorySchema.safeParse(input);
 }
-export function validatePartialCategory(input: Partial<Category>) {
+export function validatePartialCategory(input: Partial<CategorySchema>) {
 	return categorySchema.partial().safeParse(input);
 }
+export type { CategorySchema };

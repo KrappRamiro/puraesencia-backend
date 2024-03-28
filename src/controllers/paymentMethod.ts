@@ -35,7 +35,7 @@ export class PaymentMethodController {
 
 		const newPaymentMethod = await PaymentMethodModel.create(validation.data);
 
-		res.status(200).json(newPaymentMethod); // actualizar la cache del cliente
+		res.status(201).json(newPaymentMethod); // actualizar la cache del cliente
 	};
 
 	delete = async (req: Request, res: Response) => {

@@ -6,11 +6,13 @@ const customerSchema = z.object({
 	cuit: z.string().nullable(),
 });
 
-type Customer = z.infer<typeof customerSchema>;
+type CustomerSchema = z.infer<typeof customerSchema>;
 
-export function validateCustomer(input: Customer) {
+export function validateCustomer(input: CustomerSchema) {
 	return customerSchema.safeParse(input);
 }
-export function validatePartialCustomer(input: Partial<Customer>) {
+export function validatePartialCustomer(input: Partial<CustomerSchema>) {
 	return customerSchema.partial().safeParse(input);
 }
+
+export type { CustomerSchema };

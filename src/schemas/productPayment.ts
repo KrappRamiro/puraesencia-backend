@@ -9,11 +9,12 @@ const productPaymentSchema = z.object({
 	paymentMethodId: z.string().uuid(),
 });
 
-type productPayment = z.infer<typeof productPaymentSchema>;
+type ProductPaymentSchema = z.infer<typeof productPaymentSchema>;
 
-export function validateProductPayment(input: productPayment) {
+export function validateProductPayment(input: ProductPaymentSchema) {
 	return productPaymentSchema.safeParse(input);
 }
-export function validatePartialProductPayment(input: Partial<productPayment>) {
+export function validatePartialProductPayment(input: Partial<ProductPaymentSchema>) {
 	return productPaymentSchema.partial().safeParse(input);
 }
+export type { ProductPaymentSchema };

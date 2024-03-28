@@ -13,7 +13,7 @@
 		"build": "npx tsc",
 		"start": "node dist/run-server.js",
 		"dev": "nodemon ./src/run-server.ts",
-		"test": "jest --coverage",
+		"test": "jest --verbose --detectOpenHandles",
 		"prisma:generate": "npx prisma generate"
 	},
 	"dependencies": {

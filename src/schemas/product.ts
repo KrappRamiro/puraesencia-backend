@@ -8,11 +8,13 @@ const productSchema = z.object({
 	categoryId: z.string().uuid(),
 });
 
-type Product = z.infer<typeof productSchema>;
+type ProductSchema = z.infer<typeof productSchema>;
 
-export function validateProduct(input: Product) {
+export function validateProduct(input: ProductSchema) {
 	return productSchema.safeParse(input);
 }
-export function validatePartialProduct(input: Partial<Product>) {
+export function validatePartialProduct(input: Partial<ProductSchema>) {
 	return productSchema.partial().safeParse(input);
 }
+
+export type { ProductSchema };

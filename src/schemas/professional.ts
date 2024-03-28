@@ -5,11 +5,12 @@ const professionalSchema = z.object({
 	cuit: z.string(),
 });
 
-type Professional = z.infer<typeof professionalSchema>;
+type ProfessionalSchema = z.infer<typeof professionalSchema>;
 
-export function validateProfessional(input: Professional) {
+export function validateProfessional(input: ProfessionalSchema) {
 	return professionalSchema.safeParse(input);
 }
-export function validatePartialProfessional(input: Partial<Professional>) {
+export function validatePartialProfessional(input: Partial<ProfessionalSchema>) {
 	return professionalSchema.partial().safeParse(input);
 }
+export type { ProfessionalSchema };
